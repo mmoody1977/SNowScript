@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div id="connection"></div>
+    <div id="result"></div>
+    <input id="editor" type="text"/>
+    <div id="editorOut"></div>
+    <script src="Scripts/jquery-1.6.4.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.0.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var connection = $.hubConnection("http://snowscript.azurewebsites.net/signalr");
+            var hub = connection.createHubProxy("ScriptHub");
+            hub.on("onSendScript", function (result) {
+                $("#result").text(result);
+            });
+            hub.on("onRegisterSelf", function (result) {
+                $("#connection").text(result);
+            });
+            hub.on("onEdit", function (result) {
+                $("#editorOut").text(result);
+            });
+       
+
+            //$('.CodeMiror-Lines').each(function () {
+            //    var elem = $(this);
+
+            //    // Save current value of element
+            //    elem.data('oldVal', elem.val());
+
+            //    // Look for changes in the value
+            //    elem.bind("propertychange change click keyup input paste", function (event) {
+            //        // If value has changed...
+                    
+            //        if (elem.data('oldVal') != elem.val()) {
+            //            // Updated stored value
+            //            elem.data('oldVal', elem.val());
+
+            //            // Do action
+            //            var inputValue = [];
+            //            inputValue.push(elem.val());
+            //            //alert("invoking hub");
+            //            hub.invoke("inputChanged", inputValue);
+            //        }
+            //    });
+            //});
+
+
+            $('#editor').each(function () {
+                var elem = $(this);
+
+                // Save current value of element
+                elem.data('oldVal', elem.val());
+                elem.
+                // Look for changes in the value
+                elem.bind("propertychange change click keyup input paste", function (event) {
+                    // If value has changed...
+                    if (elem.data('oldVal') != elem.val()) {
+                        // Updated stored value
+                        elem.data('oldVal', elem.val());
+
+                        // Do action
+                        var inputValue = [];
+                        inputValue.push(elem.val());
+                        //alert("invoking hub");
+                        hub.invoke("inputChanged", inputValue);
+                    }
+                });
+            });
+
+            connection.start(function () {
+                var registration = [];
+                registration.push("name:VisualStudio");
+                registration.push("type:subscriber");
+                hub.invoke("registerSelf", registration);
+
+                var script = [];
+                script.push("var myVar = \"test\"");               
+                hub.invoke("SendScript", script);
+            });
+            $("#connection").click(function () {
+                hub.invoke("divClicked");
+            });
+        });
+    </script>
+
+</body>
+</html>
