@@ -12,7 +12,7 @@
     <script src="Scripts/jquery.signalR-2.2.0.js"></script>
     <script type="text/javascript">
         $(function () {
-            var connection = $.hubConnection("http://snowscript.azurewebsites.net/signalr");
+            var connection = $.hubConnection("/signalr"); //$.hubConnection("http://snowscript.azurewebsites.net/signalr");
             var hub = connection.createHubProxy("ScriptHub");
             hub.on("onSendScript", function (result) {
                 $("#result").text(result);
@@ -51,10 +51,10 @@
 
             $('#editor').each(function () {
                 var elem = $(this);
-
+                //alert(typeof (elem));
                 // Save current value of element
                 elem.data('oldVal', elem.val());
-                elem.
+                //elem.
                 // Look for changes in the value
                 elem.bind("propertychange change click keyup input paste", function (event) {
                     // If value has changed...
